@@ -232,7 +232,7 @@ func BBAdd(a,b []rune) (r []rune) {
 		alen,blen = blen,alen
 	}
 	r = make([]rune,0,10)
-	var carryflag rune = 48
+	var carryflag rune = '0'
 	var j int = 0
 	for i:=(alen-1);i>=0;i--{
 		j++
@@ -266,7 +266,7 @@ func BBAdd(a,b []rune) (r []rune) {
 			if b[i]== 48 && carryflag==48{
 				r = append(r,48)
 				carryflag = 48
-			}else if b[i]==48 && carryflag==48{
+			}else if b[i]==49 && carryflag==49{
 				r = append(r,48)
 				carryflag = 49
 			}else{

@@ -61,4 +61,24 @@ func TestInitInt(t *testing.T) {
 	if string(t4.BinData)!="10"{
 		t.Error("init 2.0 to int binary-string wrong")
 	}
+	t5,err := InitInt("433")
+	if err!=nil{
+		t.Error("init 433 to int error",err)
+	}
+	if t5.NegaFlag != false{
+		t.Error("init 433 to int minus sign error")
+	}
+	if string(t5.OgnData)!="433"{
+		t.Error("init 433 to int origin string wrong")
+	}
+	if string(t5.TenData)!="433"{
+		t.Error("init 433 to int ten-base-string wrong")
+	}
+	if string(t5.BinData)!="110110001"{
+		t.Error("init 433 to int binary-string wrong")
+	}
+	t6,_:= InitInt("324")
+	if string(t6.BinData)!="101000100"{
+		t.Error("init 324 to int binary-string wrong")
+	}
 }
