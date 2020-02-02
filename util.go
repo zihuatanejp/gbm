@@ -1,6 +1,10 @@
 package gbm
 
-import "strconv"
+import (
+	"errors"
+	"strconv"
+	"strings"
+)
 
 var mb = map[rune][]rune{
 	48:[]rune{48},
@@ -133,6 +137,33 @@ func BBCompare(a,b []rune) (r rune)  {
 	return r
 }
 
+func ConvToTen(a []rune)(r []rune,e error){
+	lena := len(a)
+	if lena==0 {
+		return a,errors.New("not a number")
+	}
+	for _,val := range a{
+		if !strings.ContainsRune("01",val){
+			return a,errors.New("not a number")
+		}
+	}
+	uptimes := lena-1
+	if uptimes==0{
+		return a,nil
+	}
+	r =  BNMultip(  []rune{ a[0] } ,[]rune{50} )
+	if a[1]==49{
+		r = BNAdd(r,[]rune{49})
+	}
+	for i:=1;i<uptimes;i++{
+		r = BNMultip( r ,[]rune{50} )
+		if a[i+1]==49{
+			r = BNAdd(r,[]rune{49})
+		}
+	}
+	return r,nil
+}
+
 func BBMinus(a,b []rune) (r []rune)  {
 	alen := len(a)
 	blen := len(b)
@@ -191,7 +222,7 @@ func BBMinus(a,b []rune) (r []rune)  {
 	return r
 }
 
-var ma = map[rune]int64{48: 0, 49: 1, 50: 2, 51: 3, 52: 4, 53: 5, 54: 6, 55: 7, 56: 8, 57: 9}
+var ma = map[rune]int64{'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}
 
 func BBAdd(a,b []rune) (r []rune) {
 	alen := len(a)
@@ -329,6 +360,28 @@ func BNAdd(a,b []rune)(r []rune){
 	}
 	r = SReverseRune(r)
 	return r
+}
+
+func ConvToBin(a []rune)(r []rune,e error){
+	b := []rune{49,48,49,48}
+	lena := len(a)
+	if lena==0 {
+		return b,errors.New("not a number")
+	}
+	for _,val := range a{
+		if !strings.ContainsRune("0123456789",val){
+			return b,errors.New("not a number")
+		}
+	}
+	uptimes:= lena-1
+	if uptimes == 0{
+		return mb[ a[0] ],nil
+	}
+	r = BBAdd( BBMultip( mb[ a[0] ],b ), mb[ a[1] ])
+	for i:=1;i<uptimes;i++{
+		r = BBAdd( BBMultip( r, b ), mb[ a[(i+1)] ] )
+	}
+	return r,nil
 }
 
 func BBMod(a,b []rune)(r []rune){
