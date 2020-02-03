@@ -82,3 +82,57 @@ func TestInitInt(t *testing.T) {
 		t.Error("init 324 to int binary-string wrong")
 	}
 }
+
+func TestInitDecimal(t *testing.T) {
+	_,err := InitDecimal("0.1")
+	if err !=nil{
+		t.Error("0.1 -> decimal fail",err)
+	}
+	_,err = InitDecimal("-0.1")
+	if err !=nil{
+		t.Error("-0.1 -> decimal fail",err)
+	}
+	_,err = InitDecimal("x0.1")
+	if err ==nil{
+		t.Error("x0.1 -> decimal should wrong")
+	}
+	t1,err := InitDecimal("3.5")
+	if t1.NegaFlag==true{
+		t.Error("3.5 -> decimal NegaFlag wrong",err)
+	}
+	if string( t1.FirstPart.TenData )!="3"{
+		t.Error("3.5 -> decimal FirstPart wrong",err)
+	}
+	if string( t1.FirstPart.BinData )!="11"{
+		t.Error("3.5 -> decimal FirstPart's BinData wrong",err)
+	}
+	if string(t1.SecondPart)!="5"{
+		t.Error("3.5 -> decimal SecondPart wrong")
+	}
+
+	t2,err := InitDecimal("1.0")
+	if string(t2.FirstPart.TenData)!="1"{
+		t.Error("1.0 -> decimal FirstPart wrong",err)
+	}
+	if string(t2.SecondPart)!="0"{
+		t.Error("1.0 -> decimal SecondPart wrong",err)
+	}
+	t3,err := InitDecimal("1")
+	if string(t3.FirstPart.TenData)!="1"{
+		t.Error("1 -> decimal FirstPart wrong",err)
+	}
+	if string(t3.SecondPart)!="0"{
+		t.Error("1 -> decimal SecondPart wrong",err)
+	}
+
+	t4,err := InitDecimal("-0.0002")
+	if t4.NegaFlag!=true{
+		t.Error("-0.0002 -> decimal NegaFlag wrong",err)
+	}
+	if string( t4.FirstPart.TenData )!="0"{
+		t.Error( "-0.0002 -> decimal FirstPart wrong",err )
+	}
+	if string( t4.SecondPart )!="0002"{
+		t.Error( "-0.0002 -> decimal SecondPart wrong",err )
+	}
+}
