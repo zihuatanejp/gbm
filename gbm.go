@@ -218,3 +218,317 @@ func (a Decimal) DescendPower(n int)(Decimal)  {
 	res,_ = InitDecimal( string(newogn) )
 	return res
 }
+
+func NumberAdd(a,b Number)(r Number)  {
+	switch a1:= a.(type) {
+	case Int:{
+		if b1,ok:=b.(Int);ok{
+			r = a1.AddInt(b1)
+		}
+		if b2,ok:= b.(Decimal);ok{
+			r= a1.AddDecimal(b2)
+		}
+	}
+	case Decimal:{
+		if b3,ok:=b.(Int);ok{
+			r= b3.AddDecimal(a1)
+		}
+		if b4,ok:= b.(Decimal);ok{
+			r= b4.AddDecimal(a1)
+		}
+	}
+	}
+	return r
+}
+
+func (a Int) AddInt(b Int) (Int){
+	if (!a.NegaFlag) && b.NegaFlag{
+		b1 := Int{b.OgnData,false,b.TenData,b.BinData}
+		return a.SubInt(b1)
+	}
+	if a.NegaFlag && (!b.NegaFlag){
+		a1 := Int{a.OgnData,false,a.TenData,a.BinData}
+		return b.SubInt(a1)
+	}
+	negaflag := false
+	newogn := []rune{}
+	if a.NegaFlag && b.NegaFlag{  // 负数+负数 -1 + -3 = -4
+		newogn = append(newogn,'-')
+		negaflag = true
+	}
+	bindata := BBAdd(a.BinData,b.BinData)
+	tenrunes ,_ :=ConvToTen( bindata )
+	newogn = append( newogn, tenrunes...)
+	res := Int{
+		OgnData:newogn,
+		NegaFlag:negaflag,
+		TenData:tenrunes,
+		BinData:bindata,
+	}
+	return res
+}
+
+func (a Int) AddDecimal(b Decimal) (Decimal){
+	if (!a.NegaFlag) && b.NegaFlag{
+		b1 := Decimal{b.OgnData,false,b.FirstPart,b.SecondPart}
+		return a.SubDecimal(b1)
+	}
+	if a.NegaFlag && (!b.NegaFlag){
+		a1 := Int{a.OgnData,false,a.TenData,a.BinData}
+		return b.SubInt(a1)
+	}
+	newogn := []rune{}
+	negaflag := false
+	if a.NegaFlag && b.NegaFlag{  // 负数+负数 -1 + -3 = -4
+		newogn = append(newogn,'-')
+		negaflag = true
+	}
+	a1 := a.AscendPower(8)
+	b1 := b.AscendPower(8)
+	bindata := BBAdd(a1.FirstPart.BinData,b1.FirstPart.BinData)
+	tenrunes ,_ :=ConvToTen( bindata )
+	newogn = append( newogn, tenrunes...)
+	resint := Int{
+		OgnData:newogn,
+		NegaFlag:negaflag,
+		TenData:tenrunes,
+		BinData:bindata,
+	}
+	resdecimal := resint.DescendPower(8)
+	return resdecimal
+}
+
+func (a Decimal)AddInt(b Int) (Decimal)  {
+	return b.AddDecimal(a)
+}
+
+func (a Decimal) AddDecimal(b Decimal)(Decimal){
+	if (!a.NegaFlag) && b.NegaFlag{
+		b1 := Decimal{b.OgnData,false,b.FirstPart,b.SecondPart}
+		return a.SubDecimal(b1)
+	}
+	if a.NegaFlag && (!b.NegaFlag){
+		a1 := Decimal{a.OgnData,false,a.FirstPart,a.SecondPart}
+		return b.SubDecimal(a1)
+	}
+	newogn := []rune{}
+	negaflag := false
+	if a.NegaFlag && b.NegaFlag{  // 负数+负数 -1 + -3 = -4
+		newogn = append(newogn,'-')
+		negaflag = true
+	}
+	a1 := a.AscendPower(8)
+	b1 := b.AscendPower(8)
+	bindata:= BBAdd(a1.FirstPart.BinData,b1.FirstPart.BinData)
+	tenrunes ,_ :=ConvToTen( bindata )
+	newogn = append( newogn, tenrunes...)
+	resint := Int{
+		OgnData:newogn,
+		NegaFlag:negaflag,
+		TenData:tenrunes,
+		BinData:bindata,
+	}
+	resdecimal := resint.DescendPower(8)
+	return resdecimal
+}
+
+func (a Int) SubInt(b Int)(Int)  {
+	if (!a.NegaFlag) && (b.NegaFlag){
+		b1 := Int{b.OgnData,false,b.TenData,b.BinData}
+		return a.AddInt(b1)
+	}
+	if a.NegaFlag && (!b.NegaFlag){
+		b1 := Int{b.OgnData,true,b.TenData,b.BinData}
+		return a.AddInt(b1)
+	}
+	comp := BBCompare(a.BinData,b.BinData)
+	var r Int
+	if a.NegaFlag && b.NegaFlag{ //负数-负数 -2 - -1= -2 +1 = 1-2 = -1        -1 - -2 = -1 + 2 = 2-1 = 1     -1 - -1 =-1+1 =0
+		if comp =='='{
+			r,_ =InitInt("0")
+			return r
+		}
+		a1 := Int{a.OgnData,false,a.TenData,a.BinData}
+		b1 := Int{b.OgnData,false,b.TenData,b.BinData}
+		return b1.SubInt(a1)
+	}
+	negaflag := false
+	newogn := []rune{}
+	var bindata,tenrunes []rune
+	if (!a.NegaFlag) && (!b.NegaFlag){
+		if comp =='='{
+			r,_ =InitInt("0")
+			return r
+		}
+		if comp=='<'{
+			negaflag =true
+			newogn = append(newogn,'-')
+			bindata = BBMinus(b.BinData,a.BinData)
+		}
+		if comp=='>'{
+			bindata = BBMinus(a.BinData,b.BinData)
+		}
+	}
+	tenrunes,_ = ConvToTen(bindata)
+	newogn = append(newogn,tenrunes...)
+	r = Int{
+		OgnData:newogn,
+		NegaFlag:negaflag,
+		TenData:tenrunes,
+		BinData:bindata,
+	}
+	return r
+}
+
+func (a Int) SubDecimal(b Decimal)(Decimal)  {
+	var r Decimal
+	if (!a.NegaFlag) && (b.NegaFlag){
+		b1 := Decimal{b.OgnData,false,b.FirstPart,b.SecondPart}
+		return a.AddDecimal(b1)
+	}
+	if a.NegaFlag && (!b.NegaFlag){
+		b1 := Decimal{b.OgnData,true,b.FirstPart,b.SecondPart}
+		return a.AddDecimal(b1)
+	}
+	a1 := a.AscendPower(8)
+	b1 := b.AscendPower(8)
+	comp := BBCompare(a1.FirstPart.BinData,b1.FirstPart.BinData)
+	if a.NegaFlag && b.NegaFlag{
+		if comp =='='{
+			r,_ =InitDecimal("0")
+			return r
+		}
+		a.NegaFlag = false
+		b.NegaFlag = false
+		return b.SubInt(a)
+	}
+	negaflag := false
+	newogn := []rune{}
+	var bindata,tenrunes []rune
+	if (!a.NegaFlag) && (!b.NegaFlag){
+		if comp =='='{
+			r,_ =InitDecimal("0")
+			return r
+		}
+		if comp=='<'{
+			negaflag =true
+			newogn = append(newogn,'-')
+			bindata = BBMinus(b1.FirstPart.BinData,a1.FirstPart.BinData)
+		}
+		if comp=='>'{
+			bindata = BBMinus(a1.FirstPart.BinData,b1.FirstPart.BinData)
+		}
+	}
+	tenrunes,_ = ConvToTen(bindata)
+	newogn = append(newogn,tenrunes...)
+	resint := Int{
+		OgnData:newogn,
+		NegaFlag:negaflag,
+		TenData:tenrunes,
+		BinData:bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
+
+func (a Decimal)SubInt(b Int)(Decimal)  {
+	var r Decimal
+	if (!a.NegaFlag) && (b.NegaFlag){
+		b1 := Int{b.OgnData,false,b.TenData,b.BinData}
+		return a.AddInt(b1)
+	}
+	if a.NegaFlag && (!b.NegaFlag){ //负数-正数 -2 - 1  = -2 + -1 =  -3
+		b1 := Int{b.OgnData,true,b.TenData,b.BinData}
+		return a.AddInt(b1)
+	}
+	a1 := a.AscendPower(8)
+	b1 := b.AscendPower(8)
+	comp := BBCompare(a1.FirstPart.BinData,b1.FirstPart.BinData)
+	if a.NegaFlag && b.NegaFlag{
+		if comp =='='{
+			r,_ =InitDecimal("0")
+			return r
+		}
+		a.NegaFlag = false
+		b.NegaFlag = false
+		return b.SubDecimal(a)
+	}
+	negaflag := false
+	newogn := []rune{}
+	var bindata,tenrunes []rune
+	if (!a.NegaFlag) && (!b.NegaFlag){
+		if comp =='='{
+			r,_ =InitDecimal("0")
+			return r
+		}
+		if comp=='<'{
+			negaflag =true
+			newogn = append(newogn,'-')
+			bindata = BBMinus(b1.FirstPart.BinData,a1.FirstPart.BinData)
+		}
+		if comp=='>'{
+			bindata = BBMinus(a1.FirstPart.BinData,b1.FirstPart.BinData)
+		}
+	}
+	tenrunes,_ = ConvToTen(bindata)
+	newogn = append(newogn,tenrunes...)
+	resint := Int{
+		OgnData:newogn,
+		NegaFlag:negaflag,
+		TenData:tenrunes,
+		BinData:bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
+
+func (a Decimal)SubDecimal(b Decimal)(Decimal)  {
+	var r Decimal
+	if (!a.NegaFlag) && (b.NegaFlag){
+		b1 := Decimal{b.OgnData,false,b.FirstPart,b.SecondPart}
+		return a.AddDecimal(b1)
+	}
+	if a.NegaFlag && (!b.NegaFlag){
+		b1 := Decimal{b.OgnData,true,b.FirstPart,b.SecondPart}
+		return a.AddDecimal(b1)
+	}
+	a1 := a.AscendPower(8)
+	b1 := b.AscendPower(8)
+	comp := BBCompare(a1.FirstPart.BinData,b1.FirstPart.BinData)
+	if a.NegaFlag && b.NegaFlag{
+		if comp =='='{
+			r,_ =InitDecimal("0")
+			return r
+		}
+		a.NegaFlag = false
+		b.NegaFlag = false
+		return b.SubDecimal(a)
+	}
+	negaflag := false
+	newogn := []rune{}
+	var bindata,tenrunes []rune
+	if (!a.NegaFlag) && (!b.NegaFlag){
+		if comp =='='{
+			r,_ =InitDecimal("0")
+			return r
+		}
+		if comp=='<'{
+			negaflag =true
+			newogn = append(newogn,'-')
+			bindata = BBMinus(b1.FirstPart.BinData,a1.FirstPart.BinData)
+		}
+		if comp=='>'{
+			bindata = BBMinus(a1.FirstPart.BinData,b1.FirstPart.BinData)
+		}
+	}
+	tenrunes,_ = ConvToTen(bindata)
+	newogn = append(newogn,tenrunes...)
+	resint := Int{
+		OgnData:newogn,
+		NegaFlag:negaflag,
+		TenData:tenrunes,
+		BinData:bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
