@@ -102,6 +102,188 @@ func InitDecimal(ogndata string) (Decimal,error){
 	return res,errors.New("not a number")
 }
 
+func (a Int) ToDecimal()(Decimal){
+	var r = Decimal{
+		OgnData:a.OgnData,
+		NegaFlag:a.NegaFlag,
+		FirstPart:a,
+		SecondPart:[]rune{'0'},
+	}
+	return r
+}
+
+func (a Decimal) ToInt()(Int){
+	var r = Int{
+		OgnData:a.OgnData,
+		NegaFlag:a.NegaFlag,
+		TenData:a.FirstPart.TenData,
+		BinData:a.FirstPart.BinData,
+	}
+	return r
+}
+
+func (a Int) FmtInt(separator string,split int) (string){
+	res := []rune{}
+	i:= 0
+	sep := SReverseRune([]rune(separator))
+	tenb := SReverseRune(a.TenData)
+	for _,val := range tenb{
+		if (i==split){
+			i=0
+			for _,v := range sep{
+				res = append(res,v)
+			}
+		}
+		res = append(res,val)
+		i++
+	}
+	if a.NegaFlag{
+		res = append(res,'-')
+	}
+	res = SReverseRune(res)
+	r := string(res)
+	return r
+}
+
+func (a Decimal) FmtDecimal(mode string,n int)(string) {
+	r := []rune{}
+	if a.NegaFlag{
+		r = append(r,'-')
+	}
+	for _,val := range a.FirstPart.TenData{
+		r = append(r, val)
+	}
+	if mode =="fixed"{
+		if n>0{
+			r = append(r,'.')
+			i:=0
+			for _,val := range a.SecondPart{
+				i++
+				r = append(r,val)
+				if i==n{
+					break
+				}
+			}
+			for ;i<n;i++{
+				r = append(r,'0')
+			}
+			return string(r)
+		}else{
+			return string(r)
+		}
+	}else if mode == "max"{
+		if n>0{
+			r = append(r,'.')
+			i:=0
+			for _,val := range a.SecondPart{
+				i++
+				r = append(r,val)
+				if i==n{
+					break
+				}
+			}
+			return string(r)
+		}else{
+			return string(r)
+		}
+	}else{
+		r = append(r,'.')
+		for _,val := range a.SecondPart{
+			r = append(r,val)
+		}
+		return string(r)
+	}
+}
+
+func NumberFmt(a Number,separator string,split int,mode string,n int)(string)  {
+	firstpart := []rune{}
+	secondpart := []rune{}
+	switch a1 := a.(type) {
+	case Int:{
+		i := 0
+		sep := SReverseRune([]rune(separator))
+		tenb := SReverseRune(a1.TenData)
+		for _, val := range tenb {
+			if (i == split) {
+				i = 0
+				for _, v := range sep {
+					firstpart = append(firstpart, v)
+				}
+			}
+			firstpart = append(firstpart, val)
+			i++
+		}
+		if a1.NegaFlag {
+			firstpart = append(firstpart, '-')
+		}
+		firstpart = SReverseRune(firstpart)
+		if mode == "fixed" {
+			if n > 0 {
+				secondpart = append(secondpart, '.')
+				for i := 0; i < n; i++ {
+					secondpart = append(secondpart, '0')
+				}
+			}
+		}
+	}
+	case Decimal:{
+		i := 0
+		sep := SReverseRune([]rune(separator))
+		tenb := SReverseRune(a1.FirstPart.TenData)
+		for _, val := range tenb {
+			if (i == split) {
+				i = 0
+				for _, v := range sep {
+					firstpart = append(firstpart, v)
+				}
+			}
+			firstpart = append(firstpart, val)
+			i++
+		}
+		if a1.NegaFlag {
+			firstpart = append(firstpart, '-')
+		}
+		firstpart = SReverseRune(firstpart)
+
+		if mode =="fixed"{
+			if n>0{
+				secondpart = append(secondpart,'.')
+				i:=0
+				for _,val := range a1.SecondPart{
+					i++
+					secondpart = append(secondpart,val)
+					if i==n{
+						break
+					}
+				}
+				for ;i<n;i++{
+					secondpart = append(secondpart,'0')
+				}
+			}
+		}else if mode == "max"{
+			if n>0{
+				secondpart = append(secondpart,'.')
+				i:=0
+				for _,val := range a1.SecondPart{
+					i++
+					secondpart = append(secondpart,val)
+					if i==n {
+						break
+					}
+				}
+			}
+		}else{
+			secondpart = append(secondpart,'.')
+			for _,val := range a1.SecondPart{
+				secondpart = append(secondpart,val)
+			}
+		}
+	}
+	}
+	res := append(firstpart,secondpart...)
+	return string(res)
+}
+
 func (a Int) AscendPower(n int) (Decimal){
 	var res Decimal
 	newognrune := []rune{}
