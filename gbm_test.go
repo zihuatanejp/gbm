@@ -137,3 +137,100 @@ func TestInitDecimal(t *testing.T) {
 	}
 }
 
+func TestInt_FmtInt(t *testing.T) {
+	t1,_ := InitInt("23444332245")
+	if t1.FmtInt("ip",2) !="2ip34ip44ip33ip22ip45"{
+		t.Error("23444332245 -> 2ip34ip44ip33ip22ip45")
+	}
+	t2,_ := InitInt("-3273934723828449274")
+	if t2.FmtInt(",",3)!="-3,273,934,723,828,449,274"{
+		t.Error("-3273934723828449274 -> -3,273,934,723,828,449,274 fail")
+	}
+	t3,_ := InitInt("3")
+	t4 := t3.FmtInt(",",3)
+	if t4!="3"{
+		t.Error("t4 fail")
+	}
+	t5 := t3.FmtInt("ok",2)
+	if t5!="3"{
+		t.Error("t5 fail")
+	}
+	t6,_ := InitInt("367")
+	t7 := t6.FmtInt("you",2)
+	if t7!="3you67"{
+		t.Error("367 -> 3you67 fail")
+	}
+	t8,_ := InitInt("768")
+	if t8.FmtInt(",",1)!="7,6,8"{
+		t.Error("768 -> 7,6,8 fmt fail")
+	}
+}
+
+func TestDecimal_FmtDecimal(t *testing.T) {
+	t1,_ := InitDecimal("3.23")
+	if t1.FmtDecimal("fixed",3)!="3.230"{
+		t.Error("3.23 -> 3.230 fail")
+	}
+	if t1.FmtDecimal("fixed",2)!="3.23"{
+		t.Error("3.23 -> 3.23 fail")
+	}
+	if t1.FmtDecimal("fixed",1)!="3.2"{
+		t.Error("3.23 -> 3.2 fail")
+	}
+	if t1.FmtDecimal("fixed",4)!="3.2300"{
+		t.Error("3.23 -> 3.2300 fail")
+	}
+	if t1.FmtDecimal("fixed",0)!="3"{
+		t.Error("3.23 -> 3 fail")
+	}
+	if t1.FmtDecimal("max",1)!="3.2"{
+		t.Error("3.23 -> 3.2 max fail")
+	}
+}
+
+func TestNumberFmt(t *testing.T) {
+	t1,_ := InitInt("32")
+	if NumberFmt(t1,",",1,"fixed",3)!="3,2.000"{
+		t.Error("32 -> 3,2.000 format fail")
+	}
+	t2,_ := InitDecimal("235323.897")
+	t3 := NumberFmt(t2,",",3,"max",2)
+	if t3!="235,323.89"{
+		t.Error("235323.897 -> 235,323.89 format error")
+	}
+}
+
+func TestInt_AscendPower(t *testing.T) {
+	t1,_ := InitInt("5")
+	if string( t1.AscendPower(0).FirstPart.TenData )!="5"{
+		t.Error("5 Rise 0 powers firstpart wrong")
+	}
+	if string( t1.AscendPower(0).SecondPart )!="0"{
+		t.Error("5 Rise 0 power secondpart wrong")
+	}
+	if string( t1.AscendPower(1).FirstPart.TenData )!="50"{
+		t.Error("5 Rise 1 powers firstpart wrong")
+	}
+	if string( t1.AscendPower(1).SecondPart )!="0"{
+		t.Error("5 Rise 1 power secondpart wrong")
+	}
+	if string( t1.AscendPower(2).FirstPart.TenData )!="500"{
+		t.Error("5 Rise 2 powers firstpart wrong")
+	}
+	if string( t1.AscendPower(2).SecondPart )!="0"{
+		t.Error("5 Rise 2 power secondpart wrong")
+	}
+	if string( t1.AscendPower(3).FirstPart.TenData )!="5000"{
+		t.Error("5 Rise 3 powers firstpart wrong")
+	}
+	if string( t1.AscendPower(3).SecondPart )!="0"{
+		t.Error("5 Rise 3 power secondpart wrong")
+	}
+	t2,_ := InitInt("-32")
+	if string( t2.AscendPower(2).OgnData ) !="-3200"{
+		t.Error("-32 Rise 2 powers == -3200 fail")
+	}
+	if t2.AscendPower(2).NegaFlag!=true{
+		t.Error("-32 Rise 2 powers negative sign wrong")
+	}
+}
