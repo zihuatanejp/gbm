@@ -136,3 +136,4 @@ func TestInitDecimal(t *testing.T) {
 		t.Error( "-0.0002 -> decimal SecondPart wrong",err )
 	}
 }
+
