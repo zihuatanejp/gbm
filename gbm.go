@@ -438,7 +438,7 @@ func (a Int) AddInt(b Int) Int {
 	}
 	negaflag := false
 	newogn := []rune{}
-	if a.NegaFlag && b.NegaFlag { // 负数+负数 -1 + -3 = -4
+	if a.NegaFlag && b.NegaFlag {
 		newogn = append(newogn, '-')
 		negaflag = true
 	}
@@ -465,7 +465,7 @@ func (a Int) AddDecimal(b Decimal) Decimal {
 	}
 	newogn := []rune{}
 	negaflag := false
-	if a.NegaFlag && b.NegaFlag { // 负数+负数 -1 + -3 = -4
+	if a.NegaFlag && b.NegaFlag {
 		newogn = append(newogn, '-')
 		negaflag = true
 	}
@@ -499,7 +499,7 @@ func (a Decimal) AddDecimal(b Decimal) Decimal {
 	}
 	newogn := []rune{}
 	negaflag := false
-	if a.NegaFlag && b.NegaFlag { // 负数+负数 -1 + -3 = -4
+	if a.NegaFlag && b.NegaFlag {
 		newogn = append(newogn, '-')
 		negaflag = true
 	}
@@ -529,7 +529,7 @@ func (a Int) SubInt(b Int) Int {
 	}
 	comp := BBCompare(a.BinData, b.BinData)
 	var r Int
-	if a.NegaFlag && b.NegaFlag { //负数-负数 -2 - -1= -2 +1 = 1-2 = -1        -1 - -2 = -1 + 2 = 2-1 = 1     -1 - -1 =-1+1 =0
+	if a.NegaFlag && b.NegaFlag {
 		if comp == '=' {
 			r, _ = InitInt("0")
 			return r
@@ -623,7 +623,7 @@ func (a Decimal) SubInt(b Int) Decimal {
 		b1 := Int{b.OgnData, false, b.TenData, b.BinData}
 		return a.AddInt(b1)
 	}
-	if a.NegaFlag && (!b.NegaFlag) { //负数-正数 -2 - 1  = -2 + -1 =  -3
+	if a.NegaFlag && (!b.NegaFlag) {
 		b1 := Int{b.OgnData, true, b.TenData, b.BinData}
 		return a.AddInt(b1)
 	}
