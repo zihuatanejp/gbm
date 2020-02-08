@@ -234,3 +234,68 @@ func TestInt_AscendPower(t *testing.T) {
 		t.Error("-32 Rise 2 powers negative sign wrong")
 	}
 }
+
+func TestDecimal_AscendPower(t *testing.T) {
+	t1,_ :=InitDecimal("-3.567")
+	if t1.AscendPower(0).NegaFlag!=true{
+		t.Error("-3.567 Rise 0 powers negative sign wrong")
+	}
+	if string( t1.AscendPower(0).FirstPart.TenData)!="3"{
+		t.Error("-3.567 Rise 0 powers firstpart wrong")
+	}
+	if string( t1.AscendPower(0).SecondPart)!="567"{
+		t.Error("-3.567 Rise 0 powers secondpart wrong")
+	}
+	t2,_ := InitDecimal("3.567")
+	if t2.AscendPower(1).NegaFlag!=false{
+		t.Error("3.567 Rise 1 powers negative sign wrong")
+	}
+	if string( t2.AscendPower(1).OgnData )!="35.67"{
+		t.Error("3.567 Rise 1 powers == 35.67 fail")
+	}
+	if string( t2.AscendPower(2).OgnData )!="356.7"{
+		t.Error("3.567 Rise 2 powers == 356.7 fail")
+	}
+	if string( t2.AscendPower(3).OgnData )!="3567.0"{
+		t.Error("3.567 Rise 3 powers == 3567.0 fail")
+	}
+	if string( t2.AscendPower(4).OgnData )!="35670.0"{
+		t.Error("3.567 Rise 4 powers == 35670.0 fail")
+	}
+	if string( t2.AscendPower(5).OgnData )!="356700.0"{
+		t.Error("3.567 Rise 5 powers == 356700.0 fail")
+	}
+	t3,_ := InitDecimal("-0.003")
+	if string( t3.AscendPower(1).OgnData)!="-0.03"{
+		t.Error("-0.003 Rise 1 powers == -0.03 fail")
+	}
+
+	if string( t3.AscendPower(2).OgnData)!="-0.3"{
+		t.Error("-0.003 Rise 2 powers == -0.3 fail")
+	}
+	if string( t3.AscendPower(3).OgnData)!="-3.0"{
+		t.Error("-0.003 Rise 3 powers == -3.0 fail")
+	}
+	if string( t3.AscendPower(4).OgnData)!="-30.0"{
+		t.Error("-0.003 Rise 4 powers == -30.0 fail")
+	}
+	if string( t3.AscendPower(5).OgnData)!="-300.0"{
+		t.Error("-0.003 Rise 5 powers == -300.0 fail")
+	}
+	t4,_ := InitDecimal("10.003")
+	if string(t4.AscendPower(1).OgnData)!="100.03"{
+		t.Error("10.003 Rise 1 powers == 100.03 fail")
+	}
+	if string(t4.AscendPower(2).OgnData)!="1000.3"{
+		t.Error("10.003 Rise 2 powers == 1000.3 fail")
+	}
+	if string(t4.AscendPower(3).OgnData)!="10003.0"{
+		t.Error("10.003 Rise 3 powers == 10003.0 fail")
+	}
+	if string(t4.AscendPower(4).OgnData)!="100030.0"{
+		t.Error("10.003 Rise 4 powers == 100030.0 fail")
+	}
+	if string(t4.AscendPower(5).OgnData)!="1000300.0"{
+		t.Error("10.003 Rise 5 powers == 1000300.0 fail")
+	}
+}
