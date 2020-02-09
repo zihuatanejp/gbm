@@ -299,3 +299,141 @@ func TestDecimal_AscendPower(t *testing.T) {
 		t.Error("10.003 Rise 5 powers == 1000300.0 fail")
 	}
 }
+
+func TestInt_DescendPower(t *testing.T) {
+	t2,_ := InitInt("55")
+	if string( t2.DescendPower(0).OgnData) !="55.0"{
+		t.Error("55 descend 0 powers fail")
+	}
+	if string( t2.DescendPower(1).OgnData)!="5.5"{
+		t.Error("55 descend 1 powers == 5.5 fail")
+	}
+	if string( t2.DescendPower(2).OgnData)!="0.55"{
+		t.Error("55 descend 2 powers == 0.55 fail")
+	}
+	if string( t2.DescendPower(3).OgnData)!="0.055"{
+		t.Error("55 descend 3 powers == 0.055 fail")
+	}
+	if string( t2.DescendPower(4).OgnData)!="0.0055"{
+		t.Error("55 descend 4 powers == 0.0055 fail")
+	}
+	if string( t2.DescendPower(4).FirstPart.TenData)!="0"{
+		t.Error("55 descend 4 powers == 0.0055 firstpart wrong")
+	}
+	if string( t2.DescendPower(4).SecondPart)!="0055"{
+		t.Error(  "55 descend 4 powers == 0.0055 secondpart wrong" )
+	}
+	t5,_:= InitInt("-23")
+	if t5.DescendPower(0).NegaFlag!=true{
+		t.Error("-23 descend 0 powers negative sign wrong")
+	}
+	if string(t5.DescendPower(0).OgnData)!="-23.0"{
+		t.Error("-23 descend 0 powers fail")
+	}
+	if string(t5.DescendPower(0).FirstPart.OgnData)!="23"{
+		t.Error("-23 descend 0 powers firstpart wrong")
+	}
+	if string(t5.DescendPower(0).SecondPart)!="0"{
+		t.Error("-23 descend 0 powers secondpart wrong")
+	}
+	if t5.DescendPower(1).NegaFlag!=true{
+		t.Error("-23 descend 0 powers negative sign wrong")
+	}
+	if string(t5.DescendPower(1).OgnData)!="-2.3"{
+		t.Error("-23 descend 1 powers fail")
+	}
+	if string(t5.DescendPower(1).FirstPart.OgnData)!="2"{
+		t.Error("-23 descend 1 powers firstpart wrong")
+	}
+	if string(t5.DescendPower(1).SecondPart)!="3"{
+		t.Error("-23 descend 1 powers secondpart wrong")
+	}
+	if t5.DescendPower(2).NegaFlag!=true{
+		t.Error("-23 descend 2 powers negative sign wrong")
+	}
+	if string(t5.DescendPower(2).OgnData)!="-0.23"{
+		t.Error("-23 descend 2 powers fail")
+	}
+	if string(t5.DescendPower(2).FirstPart.OgnData)!="0"{
+		t.Error("-23 descend 2 powers firstpart wrong")
+	}
+	if string(t5.DescendPower(2).SecondPart)!="23"{
+		t.Error("-23 descend 2 powers secondpart wrong")
+	}
+	if t5.DescendPower(3).NegaFlag!=true{
+		t.Error("-23 descend 3 powers negative sign wrong")
+	}
+	if string(t5.DescendPower(3).OgnData)!="-0.023"{
+		t.Error("-23 descend 3 powers fail")
+	}
+	if string(t5.DescendPower(3).FirstPart.OgnData)!="0"{
+		t.Error("-23 descend 3 powers firstpart wrong")
+	}
+	if string(t5.DescendPower(3).SecondPart)!="023"{
+		t.Error("-23 descend 3 powers secondpart wrong")
+	}
+	if t5.DescendPower(4).NegaFlag!=true{
+		t.Error("-23 descend 4 powers negative sign wrong")
+	}
+	if string(t5.DescendPower(4).OgnData)!="-0.0023"{
+		t.Error("-23 descend 4 powers fail")
+	}
+	if string(t5.DescendPower(4).FirstPart.OgnData)!="0"{
+		t.Error("-23 descend 4 powers firstpart wrong")
+	}
+	if string(t5.DescendPower(4).SecondPart)!="0023"{
+		t.Error("-23 descend 4 powers secondpart wrong")
+	}
+}
+
+func TestDecimal_DescendPower(t *testing.T) {
+	t1,_ :=InitDecimal("-3.567")
+	if t1.DescendPower(0).NegaFlag!=true{
+		t.Error("-3.567 descend 0 powers negative sign wrong")
+	}
+	if string( t1.DescendPower(0).FirstPart.TenData)!="3"{
+		t.Error("-3.567 descend 0 powers firstpart wrong")
+	}
+	if string( t1.DescendPower(0).SecondPart)!="567"{
+		t.Error("-3.567 descend 0 powers secondpart wrong")
+	}
+	t2,_ := InitDecimal("3.567")
+	if t2.DescendPower(1).NegaFlag!=false{
+		t.Error("3.567 descend 1 powers negative sign wrong")
+	}
+	if string( t2.DescendPower(1).OgnData )!="0.3567"{
+		t.Error("3.567 descend 1 powers == 0.3567 fail")
+	}
+	t3,_ := InitDecimal("10.003")
+	if string(t3.DescendPower(1).OgnData)!="1.0003"{
+		t.Error("10.003 descend 1 powers == 1.0003 fail")
+	}
+	if string( t3.DescendPower(2).OgnData )!= "0.10003"{
+		t.Error("10.003 descend 2 powers ==0.10003 fail")
+	}
+	if string( t3.DescendPower(3).OgnData )!= "0.010003"{
+		t.Error("10.003 descend 3 powers ==0.010003 fail")
+	}
+	if string( t3.DescendPower(4).OgnData )!= "0.0010003"{
+		t.Error("10.003 descend 4 powers ==0.0010003 fail")
+	}
+	if string( t3.DescendPower(5).OgnData )!= "0.00010003"{
+		t.Error("10.003 descend 5 powers ==0.00010003 fail")
+	}
+	t4 ,_ := InitDecimal("356.7")
+	if string( t4.DescendPower(1).OgnData)!="35.67"{
+		t.Error("356.7 descend 1 powers == 35.67 fail")
+	}
+	if string( t4.DescendPower(2).OgnData)!="3.567"{
+		t.Error("356.7 descend 2 powers == 3.567 fail")
+	}
+	if string( t4.DescendPower(3).OgnData)!="0.3567"{
+		t.Error("356.7 descend 3 powers == 0.3567 fail")
+	}
+	if string( t4.DescendPower(4).OgnData)!="0.03567"{
+		t.Error("356.7 descend 4 powers == 0.03567 fail")
+	}
+	if string( t4.DescendPower(5).OgnData)!="0.003567"{
+		t.Error("356.7 descend 5 powers == 0.003567 fail")
+	}
+}
