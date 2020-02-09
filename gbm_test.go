@@ -437,3 +437,89 @@ func TestDecimal_DescendPower(t *testing.T) {
 		t.Error("356.7 descend 5 powers == 0.003567 fail")
 	}
 }
+
+func TestInt_AddInt(t *testing.T) {
+	t1,_:= InitInt("0")
+	if string( t1.AddInt(t1).OgnData)!="0"{
+		t.Error("0+0=0 fail")
+	}
+	t2,_:= InitInt("1")
+	if string(t1.AddInt(t2).OgnData)!="1"{
+		t.Error("0+1=1 fail")
+	}
+	if string(t2.AddInt(t1).OgnData)!="1"{
+		t.Error("1+0=1 fail")
+	}
+	t3,_ := InitInt("3")
+	if string(t3.AddInt(t2).OgnData)!="4"{
+		t.Error("3+1=4 fail")
+	}
+	t4,_ := InitInt("-1")
+	if string(t3.AddInt(t4).OgnData)!="2"{
+		t.Error("3 + -1 =2 fail")
+	}
+	if string(t4.AddInt(t3).OgnData)!="2"{
+		t.Error("-1 + 3 =2 fail")
+	}
+	t5,_ := InitInt("-3")
+	if string( t5.AddInt(t2).OgnData)!="-2"{
+		t.Error("-3 + 1 = -2 fail")
+	}
+	if string(t5.AddInt(t4).OgnData)!="-4"{
+		t.Error("-3 + -1 = -4 fail")
+	}
+	t6,_ := InitInt("20")
+	t7,_ := InitInt("11")
+	t8,_ := InitInt("-16")
+	if string(t6.AddInt(t7).OgnData)!="31"{
+		t.Error("20+11=31 fail")
+	}
+	if string(t6.AddInt(t8).OgnData)!="4"{
+		t.Error("20 + -16 =4 fail")
+	}
+	if string( t7.AddInt(t8).OgnData)!="-5"{
+		t.Error("11 + -16 = -5 fail")
+	}
+	t9,_ := InitInt("23")
+	t10,_ := InitInt("39")
+	if string(t9.AddInt(t10).OgnData)!="62"{
+		t.Error("23 + 39 = 62 fail")
+	}
+	t11,_ := InitInt("-39")
+	if string(t9.AddInt(t11).OgnData)!="-16"{
+		t.Error("23 + -39 = -16 fail")
+	}
+}
+
+func TestInt_SubInt(t *testing.T) {
+	t1,_ := InitInt("3")
+	t2,_ := InitInt("1")
+	t3,_ := InitInt("-1")
+	t4,_ := InitInt("-2")
+	if string(t1.SubInt(t2).OgnData)!="2"{
+		t.Error("3 - 1 =2 fail")
+	}
+	if string(t2.SubInt(t1).OgnData)!="-2"{
+		t.Error("1 - 3 = -2 fail")
+	}
+	if string(t1.SubInt(t3).OgnData)!="4"{
+		t.Error("3 - -1 = 4 fail")
+	}
+	if string(t4.SubInt(t2).OgnData)!="-3"{
+		t.Error("-2 - 1 = -3 fail")
+	}
+	if string( t4.SubInt(t3).OgnData )!="-1"{
+		t.Error("-2 - -1 = -1 fail")
+	}
+	if string(t3.SubInt(t4).OgnData)!="1"{
+		t.Error("-1 - -2 = 1 fail")
+	}
+	if string(t3.SubInt(t3).OgnData)!="0"{
+		t.Error("-1 - -1 = 0 fail ")
+	}
+	t8,_ := InitInt("68")
+	t9,_ := InitInt("38")
+	if string(t8.SubInt(t9).OgnData)!="30"{
+		t.Error("68 - 38 = 30 fail")
+	}
+}
