@@ -11,24 +11,24 @@ type Number interface {
 }
 
 type Int struct {
-	OgnData  []rune
+	RawData  string
 	NegaFlag bool
 	TenData  []rune
 	BinData  []rune
 }
 
 type Decimal struct {
-	OgnData    []rune
+	RawData    string
 	NegaFlag   bool
 	FirstPart  Int
 	SecondPart []rune
 }
 
-func InitInt(ogndata string) (Int, error) {
+func InitInt(rawdata string) (Int, error) {
 	var res Int = Int{NegaFlag: false}
-	ogn := []rune(ogndata)
+	rawrunes := []rune(rawdata)
 	tenrunes := []rune{}
-	for ind, val := range ogn {
+	for ind, val := range rawrunes {
 		if ind == 0 && (!strings.ContainsRune("+-0123456789", val)) {
 			return res, errors.New("not a number")
 		}
@@ -44,7 +44,7 @@ func InitInt(ogndata string) (Int, error) {
 		tenrunes = append(tenrunes, val)
 	}
 	if len(tenrunes) > 0 {
-		res.OgnData = ogn
+		res.RawData = rawdata
 		res.TenData = TrimFrontChar(tenrunes, 48)
 		BinData, err := ConvToBin(res.TenData)
 		if err != nil {
@@ -56,13 +56,13 @@ func InitInt(ogndata string) (Int, error) {
 	return res, errors.New("not a number")
 }
 
-func InitDecimal(ogndata string) (Decimal, error) {
+func InitDecimal(rawdata string) (Decimal, error) {
 	var res Decimal = Decimal{NegaFlag: false}
-	ogn := []rune(ogndata)
+	rawrunes := []rune(rawdata)
 	firstpart := []rune{}
 	secondpart := []rune{}
 	seesecondpart := 0
-	for ind, val := range ogn {
+	for ind, val := range rawrunes {
 		if ind == 0 && (!strings.ContainsRune("+-0123456789", val)) {
 			return res, errors.New("not a number")
 		}
@@ -87,7 +87,7 @@ func InitDecimal(ogndata string) (Decimal, error) {
 		}
 	}
 	if len(firstpart) > 0 {
-		res.OgnData = ogn
+		res.RawData = rawdata
 		res.FirstPart, _ = InitInt(string(firstpart))
 		if len(secondpart) > 0 {
 			if len(secondpart) > 8 {
@@ -104,17 +104,17 @@ func InitDecimal(ogndata string) (Decimal, error) {
 
 func (a Int) ToDecimal() Decimal {
 	var r = Decimal{
-		OgnData:    a.OgnData,
+		RawData:    a.RawData,
 		NegaFlag:   a.NegaFlag,
 		FirstPart:  a,
-		SecondPart: []rune{'0'},
+		SecondPart: []rune{48},
 	}
 	return r
 }
 
 func (a Decimal) ToInt() Int {
 	var r = Int{
-		OgnData:  a.OgnData,
+		RawData:  a.RawData,
 		NegaFlag: a.NegaFlag,
 		TenData:  a.FirstPart.TenData,
 		BinData:  a.FirstPart.BinData,
@@ -246,7 +246,6 @@ func NumberFmt(a Number, separator string, split int, mode string, n int) string
 				firstpart = append(firstpart, '-')
 			}
 			firstpart = SReverseRune(firstpart)
-
 			if mode == "fixed" {
 				if n > 0 {
 					secondpart = append(secondpart, '.')
@@ -288,25 +287,25 @@ func NumberFmt(a Number, separator string, split int, mode string, n int) string
 
 func (a Int) AscendPower(n int) Decimal {
 	var res Decimal
-	newognrune := []rune{}
+	newrawrunes := []rune{}
 	if a.NegaFlag {
-		newognrune = append(newognrune, 45)
+		newrawrunes = append(newrawrunes, 45)
 	}
 	for _, val := range a.TenData {
-		newognrune = append(newognrune, val)
+		newrawrunes = append(newrawrunes, val)
 	}
 	for i := 0; i < n; i++ {
-		newognrune = append(newognrune, 48)
+		newrawrunes = append(newrawrunes, 48)
 	}
-	res, _ = InitDecimal(string(newognrune))
+	res, _ = InitDecimal(string(newrawrunes))
 	return res
 }
 
 func (a Decimal) AscendPower(n int) Decimal {
 	var res Decimal
-	newogn := []rune{}
+	newraw := []rune{}
 	if a.NegaFlag {
-		newogn = append(newogn, 45)
+		newraw = append(newraw, 45)
 	}
 	secondpartlen := len(a.SecondPart)
 	firstpart := []rune{}
@@ -315,7 +314,7 @@ func (a Decimal) AscendPower(n int) Decimal {
 		secondpart = a.SecondPart[n:]
 		firstpart = a.SecondPart[0:n]
 	} else {
-		secondpart = []rune{'0'}
+		secondpart = []rune{48}
 		firstpart = append([]rune{}, a.SecondPart[0:]...)
 		for i := 0; i < (n - secondpartlen); i++ {
 			firstpart = append(firstpart, 48)
@@ -327,18 +326,18 @@ func (a Decimal) AscendPower(n int) Decimal {
 		firstpart = append(a.FirstPart.TenData, firstpart...)
 	}
 
-	newogn = append(newogn, firstpart...)
-	newogn = append(newogn, 46)
-	newogn = append(newogn, secondpart...)
-	res, _ = InitDecimal(string(newogn))
+	newraw = append(newraw, firstpart...)
+	newraw = append(newraw, 46)
+	newraw = append(newraw, secondpart...)
+	res, _ = InitDecimal(string(newraw))
 	return res
 }
 
 func (a Int) DescendPower(n int) Decimal {
 	var res Decimal
-	newogn := []rune{}
+	newraw := []rune{}
 	if a.NegaFlag {
-		newogn = append(newogn, 45)
+		newraw = append(newraw, 45)
 	}
 	alen := len(a.TenData)
 	firstpart := []rune{}
@@ -355,24 +354,24 @@ func (a Int) DescendPower(n int) Decimal {
 		}
 		secondpart = append(secondpart, a.TenData...)
 	}
-	newogn = append(newogn, firstpart...)
-	newogn = append(newogn, 46)
+	newraw = append(newraw, firstpart...)
+	newraw = append(newraw, 46)
 
 	if len(secondpart) > 0 {
 		secondpart = SReverseRune(TrimFrontChar(SReverseRune(secondpart), 48))
-		newogn = append(newogn, secondpart...)
+		newraw = append(newraw, secondpart...)
 	} else {
-		newogn = append(newogn, '0')
+		newraw = append(newraw, 48)
 	}
-	res, _ = InitDecimal(string(newogn))
+	res, _ = InitDecimal(string(newraw))
 	return res
 }
 
 func (a Decimal) DescendPower(n int) Decimal {
 	var res Decimal
-	newogn := []rune{}
+	newraw := []rune{}
 	if a.NegaFlag {
-		newogn = append(newogn, 45)
+		newraw = append(newraw, 45)
 	}
 	firstpartlen := len(a.FirstPart.TenData)
 	firstpart := []rune{}
@@ -382,7 +381,7 @@ func (a Decimal) DescendPower(n int) Decimal {
 		firstpart = a.FirstPart.TenData[0:ind]
 		secondpart = append(secondpart, a.FirstPart.TenData[ind:]...)
 	} else {
-		firstpart = []rune{'0'}
+		firstpart = []rune{48}
 		for i := 0; i < n-firstpartlen; i++ {
 			secondpart = append(secondpart, 48)
 		}
@@ -391,15 +390,15 @@ func (a Decimal) DescendPower(n int) Decimal {
 
 	secondpart = append(secondpart, a.SecondPart...)
 
-	newogn = append(newogn, firstpart...)
-	newogn = append(newogn, 46)
+	newraw = append(newraw, firstpart...)
+	newraw = append(newraw, 46)
 	if len(secondpart) > 0 {
 		secondpart = SReverseRune(TrimFrontChar(SReverseRune(secondpart), 48))
-		newogn = append(newogn, secondpart...)
+		newraw = append(newraw, secondpart...)
 	} else {
-		newogn = append(newogn, 48)
+		newraw = append(newraw, 48)
 	}
-	res, _ = InitDecimal(string(newogn))
+	res, _ = InitDecimal(string(newraw))
 	return res
 }
 
@@ -429,24 +428,24 @@ func NumberAdd(a, b Number) (r Number) {
 
 func (a Int) AddInt(b Int) Int {
 	if (!a.NegaFlag) && b.NegaFlag {
-		b1 := Int{b.OgnData, false, b.TenData, b.BinData}
+		b1 := Int{b.RawData, false, b.TenData, b.BinData}
 		return a.SubInt(b1)
 	}
 	if a.NegaFlag && (!b.NegaFlag) {
-		a1 := Int{a.OgnData, false, a.TenData, a.BinData}
+		a1 := Int{a.RawData, false, a.TenData, a.BinData}
 		return b.SubInt(a1)
 	}
 	negaflag := false
-	newogn := []rune{}
+	newraw := []rune{}
 	if a.NegaFlag && b.NegaFlag {
-		newogn = append(newogn, '-')
+		newraw = append(newraw, 45)
 		negaflag = true
 	}
 	bindata := BBAdd(a.BinData, b.BinData)
 	tenrunes, _ := ConvToTen(bindata)
-	newogn = append(newogn, tenrunes...)
+	newraw = append(newraw, tenrunes...)
 	res := Int{
-		OgnData:  newogn,
+		RawData:  string(newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
@@ -456,26 +455,26 @@ func (a Int) AddInt(b Int) Int {
 
 func (a Int) AddDecimal(b Decimal) Decimal {
 	if (!a.NegaFlag) && b.NegaFlag {
-		b1 := Decimal{b.OgnData, false, b.FirstPart, b.SecondPart}
+		b1 := Decimal{b.RawData, false, b.FirstPart, b.SecondPart}
 		return a.SubDecimal(b1)
 	}
 	if a.NegaFlag && (!b.NegaFlag) {
-		a1 := Int{a.OgnData, false, a.TenData, a.BinData}
+		a1 := Int{a.RawData, false, a.TenData, a.BinData}
 		return b.SubInt(a1)
 	}
-	newogn := []rune{}
+	newraw := []rune{}
 	negaflag := false
 	if a.NegaFlag && b.NegaFlag {
-		newogn = append(newogn, '-')
+		newraw = append(newraw, 45)
 		negaflag = true
 	}
 	a1 := a.AscendPower(8)
 	b1 := b.AscendPower(8)
 	bindata := BBAdd(a1.FirstPart.BinData, b1.FirstPart.BinData)
 	tenrunes, _ := ConvToTen(bindata)
-	newogn = append(newogn, tenrunes...)
+	newraw = append(newraw, tenrunes...)
 	resint := Int{
-		OgnData:  newogn,
+		RawData:  string( newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
@@ -490,26 +489,26 @@ func (a Decimal) AddInt(b Int) Decimal {
 
 func (a Decimal) AddDecimal(b Decimal) Decimal {
 	if (!a.NegaFlag) && b.NegaFlag {
-		b1 := Decimal{b.OgnData, false, b.FirstPart, b.SecondPart}
+		b1 := Decimal{b.RawData, false, b.FirstPart, b.SecondPart}
 		return a.SubDecimal(b1)
 	}
 	if a.NegaFlag && (!b.NegaFlag) {
-		a1 := Decimal{a.OgnData, false, a.FirstPart, a.SecondPart}
+		a1 := Decimal{a.RawData, false, a.FirstPart, a.SecondPart}
 		return b.SubDecimal(a1)
 	}
-	newogn := []rune{}
+	newraw := []rune{}
 	negaflag := false
 	if a.NegaFlag && b.NegaFlag {
-		newogn = append(newogn, '-')
+		newraw = append(newraw, 45)
 		negaflag = true
 	}
 	a1 := a.AscendPower(8)
 	b1 := b.AscendPower(8)
 	bindata := BBAdd(a1.FirstPart.BinData, b1.FirstPart.BinData)
 	tenrunes, _ := ConvToTen(bindata)
-	newogn = append(newogn, tenrunes...)
+	newraw = append(newraw, tenrunes...)
 	resint := Int{
-		OgnData:  newogn,
+		RawData:  string(newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
@@ -520,45 +519,45 @@ func (a Decimal) AddDecimal(b Decimal) Decimal {
 
 func (a Int) SubInt(b Int) Int {
 	if (!a.NegaFlag) && (b.NegaFlag) {
-		b1 := Int{b.OgnData, false, b.TenData, b.BinData}
+		b1 := Int{b.RawData, false, b.TenData, b.BinData}
 		return a.AddInt(b1)
 	}
 	if a.NegaFlag && (!b.NegaFlag) {
-		b1 := Int{b.OgnData, true, b.TenData, b.BinData}
+		b1 := Int{b.RawData, true, b.TenData, b.BinData}
 		return a.AddInt(b1)
 	}
 	comp := BBCompare(a.BinData, b.BinData)
 	var r Int
 	if a.NegaFlag && b.NegaFlag {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitInt("0")
 			return r
 		}
-		a1 := Int{a.OgnData, false, a.TenData, a.BinData}
-		b1 := Int{b.OgnData, false, b.TenData, b.BinData}
+		a1 := Int{a.RawData, false, a.TenData, a.BinData}
+		b1 := Int{b.RawData, false, b.TenData, b.BinData}
 		return b1.SubInt(a1)
 	}
 	negaflag := false
-	newogn := []rune{}
+	newraw := []rune{}
 	var bindata, tenrunes []rune
 	if (!a.NegaFlag) && (!b.NegaFlag) {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitInt("0")
 			return r
 		}
-		if comp == '<' {
+		if comp == 60 {
 			negaflag = true
-			newogn = append(newogn, '-')
+			newraw = append(newraw, 45)
 			bindata = BBMinus(b.BinData, a.BinData)
 		}
-		if comp == '>' {
+		if comp == 62 {
 			bindata = BBMinus(a.BinData, b.BinData)
 		}
 	}
 	tenrunes, _ = ConvToTen(bindata)
-	newogn = append(newogn, tenrunes...)
+	newraw = append(newraw, tenrunes...)
 	r = Int{
-		OgnData:  newogn,
+		RawData:  string(newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
@@ -569,18 +568,18 @@ func (a Int) SubInt(b Int) Int {
 func (a Int) SubDecimal(b Decimal) Decimal {
 	var r Decimal
 	if (!a.NegaFlag) && (b.NegaFlag) {
-		b1 := Decimal{b.OgnData, false, b.FirstPart, b.SecondPart}
+		b1 := Decimal{b.RawData, false, b.FirstPart, b.SecondPart}
 		return a.AddDecimal(b1)
 	}
 	if a.NegaFlag && (!b.NegaFlag) {
-		b1 := Decimal{b.OgnData, true, b.FirstPart, b.SecondPart}
+		b1 := Decimal{b.RawData, true, b.FirstPart, b.SecondPart}
 		return a.AddDecimal(b1)
 	}
 	a1 := a.AscendPower(8)
 	b1 := b.AscendPower(8)
 	comp := BBCompare(a1.FirstPart.BinData, b1.FirstPart.BinData)
 	if a.NegaFlag && b.NegaFlag {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitDecimal("0")
 			return r
 		}
@@ -589,26 +588,26 @@ func (a Int) SubDecimal(b Decimal) Decimal {
 		return b.SubInt(a)
 	}
 	negaflag := false
-	newogn := []rune{}
+	newraw := []rune{}
 	var bindata, tenrunes []rune
 	if (!a.NegaFlag) && (!b.NegaFlag) {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitDecimal("0")
 			return r
 		}
-		if comp == '<' {
+		if comp == 60 {
 			negaflag = true
-			newogn = append(newogn, '-')
+			newraw = append(newraw, '-')
 			bindata = BBMinus(b1.FirstPart.BinData, a1.FirstPart.BinData)
 		}
-		if comp == '>' {
+		if comp == 62 {
 			bindata = BBMinus(a1.FirstPart.BinData, b1.FirstPart.BinData)
 		}
 	}
 	tenrunes, _ = ConvToTen(bindata)
-	newogn = append(newogn, tenrunes...)
+	newraw = append(newraw, tenrunes...)
 	resint := Int{
-		OgnData:  newogn,
+		RawData:  string(newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
@@ -620,18 +619,18 @@ func (a Int) SubDecimal(b Decimal) Decimal {
 func (a Decimal) SubInt(b Int) Decimal {
 	var r Decimal
 	if (!a.NegaFlag) && (b.NegaFlag) {
-		b1 := Int{b.OgnData, false, b.TenData, b.BinData}
+		b1 := Int{b.RawData, false, b.TenData, b.BinData}
 		return a.AddInt(b1)
 	}
 	if a.NegaFlag && (!b.NegaFlag) {
-		b1 := Int{b.OgnData, true, b.TenData, b.BinData}
+		b1 := Int{b.RawData, true, b.TenData, b.BinData}
 		return a.AddInt(b1)
 	}
 	a1 := a.AscendPower(8)
 	b1 := b.AscendPower(8)
 	comp := BBCompare(a1.FirstPart.BinData, b1.FirstPart.BinData)
 	if a.NegaFlag && b.NegaFlag {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitDecimal("0")
 			return r
 		}
@@ -640,26 +639,26 @@ func (a Decimal) SubInt(b Int) Decimal {
 		return b.SubDecimal(a)
 	}
 	negaflag := false
-	newogn := []rune{}
+	newraw := []rune{}
 	var bindata, tenrunes []rune
 	if (!a.NegaFlag) && (!b.NegaFlag) {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitDecimal("0")
 			return r
 		}
-		if comp == '<' {
+		if comp == 60 {
 			negaflag = true
-			newogn = append(newogn, '-')
+			newraw = append(newraw, '-')
 			bindata = BBMinus(b1.FirstPart.BinData, a1.FirstPart.BinData)
 		}
-		if comp == '>' {
+		if comp == 62 {
 			bindata = BBMinus(a1.FirstPart.BinData, b1.FirstPart.BinData)
 		}
 	}
 	tenrunes, _ = ConvToTen(bindata)
-	newogn = append(newogn, tenrunes...)
+	newraw = append(newraw, tenrunes...)
 	resint := Int{
-		OgnData:  newogn,
+		RawData:  string(newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
@@ -671,18 +670,18 @@ func (a Decimal) SubInt(b Int) Decimal {
 func (a Decimal) SubDecimal(b Decimal) Decimal {
 	var r Decimal
 	if (!a.NegaFlag) && (b.NegaFlag) {
-		b1 := Decimal{b.OgnData, false, b.FirstPart, b.SecondPart}
+		b1 := Decimal{b.RawData, false, b.FirstPart, b.SecondPart}
 		return a.AddDecimal(b1)
 	}
 	if a.NegaFlag && (!b.NegaFlag) {
-		b1 := Decimal{b.OgnData, true, b.FirstPart, b.SecondPart}
+		b1 := Decimal{b.RawData, true, b.FirstPart, b.SecondPart}
 		return a.AddDecimal(b1)
 	}
 	a1 := a.AscendPower(8)
 	b1 := b.AscendPower(8)
 	comp := BBCompare(a1.FirstPart.BinData, b1.FirstPart.BinData)
 	if a.NegaFlag && b.NegaFlag {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitDecimal("0")
 			return r
 		}
@@ -691,26 +690,26 @@ func (a Decimal) SubDecimal(b Decimal) Decimal {
 		return b.SubDecimal(a)
 	}
 	negaflag := false
-	newogn := []rune{}
+	newraw := []rune{}
 	var bindata, tenrunes []rune
 	if (!a.NegaFlag) && (!b.NegaFlag) {
-		if comp == '=' {
+		if comp == 61 {
 			r, _ = InitDecimal("0")
 			return r
 		}
-		if comp == '<' {
+		if comp == 60 {
 			negaflag = true
-			newogn = append(newogn, '-')
+			newraw = append(newraw, '-')
 			bindata = BBMinus(b1.FirstPart.BinData, a1.FirstPart.BinData)
 		}
-		if comp == '>' {
+		if comp == 62 {
 			bindata = BBMinus(a1.FirstPart.BinData, b1.FirstPart.BinData)
 		}
 	}
 	tenrunes, _ = ConvToTen(bindata)
-	newogn = append(newogn, tenrunes...)
+	newraw = append(newraw, tenrunes...)
 	resint := Int{
-		OgnData:  newogn,
+		RawData:  string(newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
