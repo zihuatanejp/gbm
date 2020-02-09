@@ -426,6 +426,30 @@ func NumberAdd(a, b Number) (r Number) {
 	return r
 }
 
+func NumberSub(a, b Number) (r Number) {
+	switch a1 := a.(type) {
+	case Int:
+		{
+			if b1, ok := b.(Int); ok {
+				r = a1.SubInt(b1)
+			}
+			if b2, ok := b.(Decimal); ok {
+				r = a1.SubDecimal(b2)
+			}
+		}
+	case Decimal:
+		{
+			if b3, ok := b.(Int); ok {
+				r = a1.SubInt(b3)
+			}
+			if b4, ok := b.(Decimal); ok {
+				r = a1.SubDecimal(b4)
+			}
+		}
+	}
+	return r
+}
+
 func (a Int) AddInt(b Int) Int {
 	if (!a.NegaFlag) && b.NegaFlag {
 		b1 := Int{b.RawData, false, b.TenData, b.BinData}
@@ -474,7 +498,7 @@ func (a Int) AddDecimal(b Decimal) Decimal {
 	tenrunes, _ := ConvToTen(bindata)
 	newraw = append(newraw, tenrunes...)
 	resint := Int{
-		RawData:  string( newraw),
+		RawData:  string(newraw),
 		NegaFlag: negaflag,
 		TenData:  tenrunes,
 		BinData:  bindata,
