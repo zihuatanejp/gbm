@@ -444,6 +444,11 @@ func TestNumberAdd(t *testing.T) {
 	if NumberAdd(t1,t2).(Int).RawData!="68672"{
 		t.Error("68438 + 234 = 68672 fail")
 	}
+	t3,_ := InitDecimal("3.156")
+	t4,_ := InitDecimal("1.544")
+	if NumberAdd(t3,t4).(Decimal).RawData!="4.7"{
+		t.Error("3.156 + 1.544 = 4.7 fail")
+	}
 }
 
 func TestNumberSub(t *testing.T) {
@@ -460,6 +465,35 @@ func TestNumberSub(t *testing.T) {
 	t5,_ := InitInt("67")
 	if NumberSub(t4,t5).(Int).RawData!="510"{
 		t.Error("577 - 67 = 510 fail")
+	}
+	t6,_ := InitInt("2505")
+	t7,_ := InitInt("700")
+	if NumberSub(t6,t7).(Int).RawData!="1805"{
+		t.Error(" 2505 - 700 = 1805 fail")
+	}
+	t8,_ := InitInt("31258")
+	t9,_ := InitInt("28100")
+	if NumberSub(t8,t9).(Int).RawData!="3158"{
+		t.Error("31258 - 28100 = 3158 fail")
+	}
+	t10,_ := InitInt("3158")
+	if NumberSub(t8,t10).(Int).RawData!="28100"{
+		t.Error("31258 - 3158 =  28100 fail")
+	}
+	t11,_ := InitInt("40249")
+	t12,_ := InitInt("37252")
+	if NumberSub(t11,t12).(Int).RawData!="2997"{
+		t.Error("40249 - 37252 = 2997 fail")
+	}
+	tt1,_ := InitDecimal("4.7")
+	tt2,_ := InitDecimal("3.156")
+
+	if tt1.SubDecimal(tt2).RawData!="1.544"{
+		t.Error("4.7 - 3.156 = 1.544 fail")
+	}
+	tt4,_:=InitInt("-0")
+	if tt1.SubInt(tt4).RawData!="4.7"{
+		t.Error("4.7 - -0 =4.7 fail")
 	}
 }
 
