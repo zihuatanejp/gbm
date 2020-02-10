@@ -505,6 +505,28 @@ func NumberPower(a, b Number) (r Decimal) {
 	return r
 }
 
+func NumberDivis(a,b Number)(r Decimal){
+	switch a1:=a.(type) {
+	case Int:{
+		if b1,ok:=b.(Int);ok{
+			r = a1.DivisInt(b1)
+		}
+		if b2,ok:= b.(Decimal);ok{
+			r= a1.DivisDecimal(b2)
+		}
+	}
+	case Decimal:{
+		if b3,ok:=b.(Int);ok{
+			r= a1.DivisInt(b3)
+		}
+		if b4,ok:= b.(Decimal);ok{
+			r= a1.DivisDecimal(b4)
+		}
+	}
+	}
+	return r
+}
+
 func (a Int) AddInt(b Int) Int {
 	if (!a.NegaFlag) && b.NegaFlag {
 		b1 := Int{b.RawData, false, b.TenData, b.BinData}
@@ -953,7 +975,7 @@ func (a Int) DivisInt(b Int) Decimal {
 	return r
 }
 
-func (a Int) DivisTypeDecimal(b Decimal) (r Decimal) {
+func (a Int) DivisDecimal(b Decimal) (r Decimal) {
 	newraw := []rune{}
 	negaflag := false
 	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
