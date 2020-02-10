@@ -497,6 +497,27 @@ func TestNumberSub(t *testing.T) {
 	}
 }
 
+func TestNumberMultip(t *testing.T) {
+	t1,_ := InitInt("577")
+	t2,_ := InitInt("67")
+	if NumberMultip(t1,t2).(Int).RawData!="38659"{
+		t.Error("577 * 67 = 38659 fail")
+	}
+	t3,_ := InitDecimal("-1.1")
+	if NumberMultip(t3,t3).(Decimal).RawData!="1.21"{
+		t.Error("-1.1 * -1.1 = 1.21 fail")
+	}
+	t4,_ := InitDecimal("1.08")
+	t5,_ := InitInt("34266")
+	if NumberMultip(t4,t5).(Decimal).RawData!="37007.28"{
+		t.Error("1.08 * 34266 = 37007.28 fail")
+	}
+	t6,_ := InitInt("0")
+	if NumberMultip(t5,t6).(Int).RawData!="0"{
+		t.Error("34266 * 0 = 0")
+	}
+}
+
 func TestInt_AddInt(t *testing.T) {
 	t1, _ := InitInt("0")
 	if t1.AddInt(t1).RawData != "0" {

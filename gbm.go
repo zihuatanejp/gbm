@@ -2,6 +2,7 @@ package gbm
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -450,6 +451,54 @@ func NumberSub(a, b Number) (r Number) {
 	return r
 }
 
+func NumberMultip(a, b Number) (r Number) {
+	switch a1 := a.(type) {
+	case Int:
+		{
+			if b1, ok := b.(Int); ok {
+				r = a1.MultipInt(b1)
+			}
+			if b2, ok := b.(Decimal); ok {
+				r = a1.MultipDecimal(b2)
+			}
+		}
+	case Decimal:
+		{
+			if b3, ok := b.(Int); ok {
+				r = a1.MultipInt(b3)
+			}
+			if b4, ok := b.(Decimal); ok {
+				r = a1.MultipDecimal(b4)
+			}
+		}
+	}
+	return r
+}
+
+func NumberPower(a, b Number) (r Decimal) {
+	switch a1 := a.(type) {
+	case Int:
+		{
+			if b1, ok := b.(Int); ok {
+				r = a1.PowerInt(b1)
+			}
+			if b2, ok := b.(Decimal); ok {
+				r = a1.PowerDecimal(b2)
+			}
+		}
+	case Decimal:
+		{
+			if b3, ok := b.(Int); ok {
+				r = a1.PowerInt(b3)
+			}
+			if b4, ok := b.(Decimal); ok {
+				r = a1.PowerDecimal(b4)
+			}
+		}
+	}
+	return r
+}
+
 func (a Int) AddInt(b Int) Int {
 	if (!a.NegaFlag) && b.NegaFlag {
 		b1 := Int{b.RawData, false, b.TenData, b.BinData}
@@ -731,6 +780,229 @@ func (a Decimal) SubDecimal(b Decimal) Decimal {
 		}
 	}
 	tenrunes, _ = ConvToTen(bindata)
+	newraw = append(newraw, tenrunes...)
+	resint := Int{
+		RawData:  string(newraw),
+		NegaFlag: negaflag,
+		TenData:  tenrunes,
+		BinData:  bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
+
+func (a Int) MultipInt(b Int) Int {
+	var r Int
+	newraw := []rune{}
+	negaflag := false
+	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
+		newraw = append(newraw, 45)
+		negaflag = true
+	}
+	bindata := BBMultip(a.BinData, b.BinData)
+	tenrunes, _ := ConvToTen(bindata)
+	newraw = append(newraw, tenrunes...)
+	r = Int{
+		RawData:  string(newraw),
+		NegaFlag: negaflag,
+		TenData:  tenrunes,
+		BinData:  bindata,
+	}
+	return r
+}
+
+func (a Int) MultipDecimal(b Decimal) Decimal {
+	var r Decimal
+	newraw := []rune{}
+	negaflag := false
+	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
+		newraw = append(newraw, 45)
+		negaflag = true
+	}
+	b1 := b.AscendPower(8)
+	bindata := BBMultip(a.BinData, b1.FirstPart.BinData)
+	tenrunes, _ := ConvToTen(bindata)
+	newraw = append(newraw, tenrunes...)
+	resint := Int{
+		RawData:  string(newraw),
+		NegaFlag: negaflag,
+		TenData:  tenrunes,
+		BinData:  bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
+
+func (a Decimal) MultipInt(b Int) Decimal {
+	var r Decimal = b.MultipDecimal(a)
+	return r
+}
+
+func (a Decimal) MultipDecimal(b Decimal) Decimal {
+	var r Decimal
+	newraw := []rune{}
+	negaflag := false
+	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
+		newraw = append(newraw, 45)
+		negaflag = true
+	}
+	a1 := a.AscendPower(8)
+	b1 := b.AscendPower(8)
+	bindata := BBMultip(a1.FirstPart.BinData, b1.FirstPart.BinData)
+	tenrunes, _ := ConvToTen(bindata)
+	newraw = append(newraw, tenrunes...)
+	resint := Int{
+		RawData:  string(newraw),
+		NegaFlag: negaflag,
+		TenData:  tenrunes,
+		BinData:  bindata,
+	}
+	r = resint.DescendPower(16)
+	return r
+}
+
+func (a Int) PowerInt(b Int) Decimal {
+	var r Decimal
+	if (!b.NegaFlag) && (len(b.TenData) == 1) {
+		if b.TenData[0] == 48 {
+			r, _ = InitDecimal("1.0")
+			return r
+		}
+		if b.TenData[0] == 49 {
+			return a.ToDecimal()
+		}
+	}
+	var i int64 = 1
+	var limit int64
+	resint := a
+	limit, _ = strconv.ParseInt(string(b.TenData), 10, 64)
+	for ; i < limit; i++ {
+		resint = resint.MultipInt(a)
+	}
+	if b.NegaFlag {
+		r, _ = InitDecimal("1.0")
+		r = r.DivisInt(resint)
+	} else {
+		r = resint.ToDecimal()
+	}
+	return r
+}
+
+func (a Int) PowerDecimal(b Decimal) Decimal {
+	var r Decimal = a.PowerInt(b.ToInt())
+	return r
+}
+
+func (a Decimal) PowerInt(b Int) Decimal {
+	var r Decimal
+	if (!b.NegaFlag) && (len(b.TenData) == 1) {
+		if b.TenData[0] == 48 {
+			r, _ = InitDecimal("1.0")
+			return r
+		}
+		if b.TenData[0] == 49 {
+			return a
+		}
+	}
+	var i int64 = 1
+	var limit int64
+	resdecimal := a
+	limit, _ = strconv.ParseInt(string(b.TenData), 10, 64)
+	for ; i < limit; i++ {
+		resdecimal = resdecimal.MultipDecimal(a)
+	}
+	if b.NegaFlag {
+		r, _ = InitDecimal("1.0")
+		r = r.DivisDecimal(resdecimal)
+	} else {
+		r = resdecimal
+	}
+	return r
+}
+
+func (a Decimal) PowerDecimal(b Decimal) Decimal {
+	var r Decimal = a.PowerInt(b.ToInt())
+	return r
+}
+
+func (a Int) DivisInt(b Int) Decimal {
+	var r Decimal
+	newraw := []rune{}
+	negaflag := false
+	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
+		newraw = append(newraw, 45)
+		negaflag = true
+	}
+	a1 := a.AscendPower(8)
+	bindata := BBDivis(a1.FirstPart.BinData, b.BinData)
+	tenrunes, _ := ConvToTen(bindata)
+	newraw = append(newraw, tenrunes...)
+	resint := Int{
+		RawData:  string(newraw),
+		NegaFlag: negaflag,
+		TenData:  tenrunes,
+		BinData:  bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
+
+func (a Int) DivisTypeDecimal(b Decimal) (r Decimal) {
+	newraw := []rune{}
+	negaflag := false
+	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
+		newraw = append(newraw, 45)
+		negaflag = true
+	}
+	a1 := a.AscendPower(16)
+	b1 := b.AscendPower(8)
+	bindata := BBDivis(a1.FirstPart.BinData, b1.FirstPart.BinData)
+	tenrunes, _ := ConvToTen(bindata)
+	newraw = append(newraw, tenrunes...)
+	resint := Int{
+		RawData:  string(newraw),
+		NegaFlag: negaflag,
+		TenData:  tenrunes,
+		BinData:  bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
+
+func (a Decimal) DivisInt(b Int) Decimal {
+	var r Decimal
+	newraw := []rune{}
+	negaflag := false
+	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
+		newraw = append(newraw, 45)
+		negaflag = true
+	}
+	a1 := a.AscendPower(16)
+	b1 := b.AscendPower(8)
+	bindata := BBDivis(a1.FirstPart.BinData, b1.FirstPart.BinData)
+	tenrunes, _ := ConvToTen(bindata)
+	newraw = append(newraw, tenrunes...)
+	resint := Int{
+		RawData:  string(newraw),
+		NegaFlag: negaflag,
+		TenData:  tenrunes,
+		BinData:  bindata,
+	}
+	r = resint.DescendPower(8)
+	return r
+}
+
+func (a Decimal) DivisDecimal(b Decimal) (r Decimal) {
+	newraw := []rune{}
+	negaflag := false
+	if (a.NegaFlag && (!b.NegaFlag)) || (b.NegaFlag && (!a.NegaFlag)) {
+		newraw = append(newraw, 45)
+		negaflag = true
+	}
+	a1 := a.AscendPower(16)
+	b1 := b.AscendPower(8)
+	bindata := BBDivis(a1.FirstPart.BinData, b1.FirstPart.BinData)
+	tenrunes, _ := ConvToTen(bindata)
 	newraw = append(newraw, tenrunes...)
 	resint := Int{
 		RawData:  string(newraw),
