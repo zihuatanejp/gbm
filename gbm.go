@@ -505,26 +505,52 @@ func NumberPower(a, b Number) (r Decimal) {
 	return r
 }
 
-func NumberDivis(a,b Number)(r Decimal){
-	switch a1:=a.(type) {
-	case Int:{
-		if b1,ok:=b.(Int);ok{
-			r = a1.DivisInt(b1)
+func NumberDivis(a, b Number) (r Decimal) {
+	switch a1 := a.(type) {
+	case Int:
+		{
+			if b1, ok := b.(Int); ok {
+				r = a1.DivisInt(b1)
+			}
+			if b2, ok := b.(Decimal); ok {
+				r = a1.DivisDecimal(b2)
+			}
 		}
-		if b2,ok:= b.(Decimal);ok{
-			r= a1.DivisDecimal(b2)
+	case Decimal:
+		{
+			if b3, ok := b.(Int); ok {
+				r = a1.DivisInt(b3)
+			}
+			if b4, ok := b.(Decimal); ok {
+				r = a1.DivisDecimal(b4)
+			}
 		}
-	}
-	case Decimal:{
-		if b3,ok:=b.(Int);ok{
-			r= a1.DivisInt(b3)
-		}
-		if b4,ok:= b.(Decimal);ok{
-			r= a1.DivisDecimal(b4)
-		}
-	}
 	}
 	return r
+}
+
+func NumberMod(a, b Number) (r Int, err error) {
+	switch a1 := a.(type) {
+	case Int:
+		{
+			if b1, ok := b.(Int); ok {
+				r, err = a1.ModInt(b1)
+			}
+			if b2, ok := b.(Decimal); ok {
+				r, err = a1.ModDecimal(b2)
+			}
+		}
+	case Decimal:
+		{
+			if b3, ok := b.(Int); ok {
+				r, err = a1.ModInt(b3)
+			}
+			if b4, ok := b.(Decimal); ok {
+				r, err = a1.ModDecimal(b4)
+			}
+		}
+	}
+	return r, err
 }
 
 func (a Int) AddInt(b Int) Int {
@@ -1040,4 +1066,41 @@ func (a Decimal) DivisDecimal(b Decimal) (r Decimal) {
 	}
 	r = resint.DescendPower(8)
 	return r
+}
+
+func (a Int) ModInt(b Int) (r Int, e error) {
+	bbcomp := BBCompare(a.BinData, b.BinData)
+	if bbcomp == 60 {
+		e = errors.New("mod,but a<b,fail")
+		return r, e
+	}
+	if bbcomp == 61 {
+		r, _ := InitInt("0")
+		return r, nil
+	}
+	c := a.DivisInt(b).ToInt()
+	a.NegaFlag = false
+	b.NegaFlag = false
+	c.NegaFlag = false
+	r = a.SubInt(c.MultipInt(b))
+	return r, nil
+}
+
+func (a Int) ModDecimal(b Decimal) (Int, error) {
+	b1 := b.ToInt()
+	r, err := a.ModInt(b1)
+	return r, err
+}
+
+func (a Decimal) ModInt(b Int) (Int, error) {
+	a1 := a.ToInt()
+	r, err := a1.ModInt(b)
+	return r, err
+}
+
+func (a Decimal) ModDecimal(b Decimal) (Int, error) {
+	a1 := a.ToInt()
+	b1 := b.ToInt()
+	r, err := a1.ModInt(b1)
+	return r, err
 }
