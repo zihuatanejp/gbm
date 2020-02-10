@@ -385,7 +385,6 @@ func ConvToBin(a []rune)(r []rune,e error){
 	return r,nil
 }
 
-
 func BBMod(a,b []rune)(r []rune){
 	times := BBDivis(a,b)
 	r = BBMinus(a, BBMultip(b,times) )

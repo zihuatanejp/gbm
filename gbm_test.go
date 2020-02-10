@@ -518,6 +518,27 @@ func TestNumberMultip(t *testing.T) {
 	}
 }
 
+func TestNumberPower(t *testing.T) {
+	t1,_ := InitInt("10")
+	t2,_ := InitInt("3")
+	if NumberPower(t1,t2).RawData!="1000"{
+		t.Error("10 ** 3 = 1000")
+	}
+	t3,_ := InitDecimal("10.0")
+	t4,_ := InitDecimal("3.0")
+	if NumberPower(t3,t4).RawData!="1000.0"{
+		t.Error("10.0 ** 3.0 = 1000.0 fail")
+	}
+	if NumberPower(t3,t2).RawData!="1000.0"{
+		t.Error("10.0 ** 3 = 1000.0 fail")
+	}
+	t5,_ := InitDecimal("1.15")
+	t6,_ := InitInt("22")
+	if NumberPower(t5,t6).RawData!="21.64474527"{
+		t.Error("1.15 ** 22 = 21.64474527 fail")
+	}
+}
+
 func TestInt_AddInt(t *testing.T) {
 	t1, _ := InitInt("0")
 	if t1.AddInt(t1).RawData != "0" {

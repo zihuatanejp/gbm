@@ -360,6 +360,9 @@ func (a Int) DescendPower(n int) Decimal {
 
 	if len(secondpart) > 0 {
 		secondpart = SReverseRune(TrimFrontChar(SReverseRune(secondpart), 48))
+		if len(secondpart) > 8 {
+			secondpart = secondpart[:8]
+		}
 		newraw = append(newraw, secondpart...)
 	} else {
 		newraw = append(newraw, 48)
@@ -395,6 +398,9 @@ func (a Decimal) DescendPower(n int) Decimal {
 	newraw = append(newraw, 46)
 	if len(secondpart) > 0 {
 		secondpart = SReverseRune(TrimFrontChar(SReverseRune(secondpart), 48))
+		if len(secondpart) > 8 {
+			secondpart = secondpart[:8]
+		}
 		newraw = append(newraw, secondpart...)
 	} else {
 		newraw = append(newraw, 48)
