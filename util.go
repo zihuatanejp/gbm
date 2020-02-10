@@ -12,12 +12,13 @@ var mb = map[rune][]rune{
 	50:[]rune{49,48},
 	51:[]rune{49,49},
 	52:[]rune{49,48,48},
-	53:[]rune{49,48,48},
+	53:[]rune{49,48,49},
 	54:[]rune{49,49,48},
 	55:[]rune{49,49,49},
 	56:[]rune{49,48,48,48},
 	57:[]rune{49,48,48,49},
 }
+
 
 func TrimFrontChar(a []rune, char rune)([]rune){
 	alen := len(a)
@@ -177,10 +178,10 @@ func BBMinus(a,b []rune) (r []rune)  {
 				if a[i]==48&& b[blen-j]==48{
 					r = append(r,48)
 					carryflag = 48
-				}else if a[i]==48&& b[blen-j]==49{
+				}else if a[i]==48 && b[blen-j]==49{
 					r = append(r,49)
 					carryflag = 49
-				}else if a[i]==49&& b[blen-j]==48{
+				}else if a[i]==49 && b[blen-j]==48{
 					r = append(r,49)
 					carryflag = 48
 				}else{
@@ -191,10 +192,10 @@ func BBMinus(a,b []rune) (r []rune)  {
 				if a[i]==48&& b[blen-j]==48{
 					r = append(r,49)
 					carryflag = 49
-				}else if a[i]==48&& b[blen-j]==49{
+				}else if a[i]==48 && b[blen-j]==49{
 					r = append(r,48)
 					carryflag = 49
-				}else if a[i]==49&& b[blen-j]==48{
+				}else if a[i]==49 && b[blen-j]==48{
 					r = append(r,48)
 					carryflag = 48
 				}else{
@@ -383,6 +384,7 @@ func ConvToBin(a []rune)(r []rune,e error){
 	}
 	return r,nil
 }
+
 
 func BBMod(a,b []rune)(r []rune){
 	times := BBDivis(a,b)

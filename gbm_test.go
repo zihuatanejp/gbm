@@ -438,6 +438,31 @@ func TestDecimal_DescendPower(t *testing.T) {
 	}
 }
 
+func TestNumberAdd(t *testing.T) {
+	t1,_ := InitInt("68438")
+	t2,_ := InitInt("234")
+	if NumberAdd(t1,t2).(Int).RawData!="68672"{
+		t.Error("68438 + 234 = 68672 fail")
+	}
+}
+
+func TestNumberSub(t *testing.T) {
+	t1,_ := InitInt("7289")
+	t2,_ := InitInt("4266")
+	t3,_ := InitInt("3023")
+	if NumberSub(t1,t2).(Int).RawData!=t3.RawData{
+		t.Error("7289 - 4266 = 3023 fail")
+	}
+	if NumberSub(t1,t3).(Int).RawData!=t2.RawData{
+		t.Error("7289 - 3023 = 4266 fail")
+	}
+	t4,_ := InitInt("577")
+	t5,_ := InitInt("67")
+	if NumberSub(t4,t5).(Int).RawData!="510"{
+		t.Error("577 - 67 = 510 fail")
+	}
+}
+
 func TestInt_AddInt(t *testing.T) {
 	t1, _ := InitInt("0")
 	if t1.AddInt(t1).RawData != "0" {
