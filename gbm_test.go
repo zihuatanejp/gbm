@@ -1,6 +1,8 @@
 package gbm
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestInitInt(t *testing.T) {
 	t1, err := InitInt("0")

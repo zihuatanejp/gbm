@@ -29,7 +29,18 @@ there is no limit on the numerical range of 32bit, int64bit.
   
  ### Usage
  
- 
+ ```go
+num1,err := InitInt("12")
+num2,err := InitInt("-12.3")
+num3,err := InitDecimal("-12.3")
+/*
+num1:{ RawData:12, NegaFlag:false, TenData:[1,2], BinData:[1,1,0,0] }
+num2:{ RawData:-12.3, NegaFlag:true, TenData:[1,2], BinData:[1, 1, 0, 0] }
+num3:{ RawData:-12.3, NegaFlag:true, FirstPart:num1, SecondPart:[3]}
+*/
+
+
+```
   
  ## License
  
