@@ -1,7 +1,8 @@
 # gbm
 go base math lib.
 
-### description
+## Description
+
 * Support infinite number operation, 
 there is no limit on the numerical range of 32bit, int64bit.
 
@@ -26,4 +27,14 @@ there is no limit on the numerical range of 32bit, int64bit.
   but the fault tolerance is processed. The negative sign will be ignored directly, 
   so don't worry about errors)
   
+ ### Usage
  
+ 
+  
+ ## License
+ 
+ Apache License 2.0
+ 
+## Author
+
+zihuatanejp 
