@@ -286,6 +286,175 @@ func NumberFmt(a Number, separator string, split int, mode string, n int) string
 	return string(res)
 }
 
+func NumberCompare(a,b Number) (comp string){
+	switch a1:= a.(type) {
+	case Int:{
+		if b1,ok:=b.(Int);ok{
+			if (!a1.NegaFlag) &&(b1.NegaFlag){
+				return ">"
+			}
+			if (a1.NegaFlag) &&(!b1.NegaFlag){
+				return "<"
+			}
+			if (!a1.NegaFlag) &&(!b1.NegaFlag){
+				return string( BBCompare(a1.BinData,b1.BinData) )
+			}
+			if a1.NegaFlag && b1.NegaFlag {
+				return string( BBCompare(b1.BinData,a1.BinData) )
+			}
+		}
+		if b2,ok:= b.(Decimal);ok{
+			if (!a1.NegaFlag) &&(b2.NegaFlag){
+				return ">"
+			}
+			if (a1.NegaFlag) &&(!b2.NegaFlag){
+				return "<"
+			}
+			if (!a1.NegaFlag) &&(!b2.NegaFlag){
+				comp := BBCompare(a1.BinData,b2.FirstPart.BinData)
+				if (comp ==62) ||(comp==60){
+					return string(comp)
+				}
+				if strings.ContainsAny("123456789", string(b2.SecondPart) ){
+					return "<"
+				}
+				return string(comp)
+			}
+			if a1.NegaFlag && b2.NegaFlag {
+				comp := BBCompare(b2.FirstPart.BinData , a1.BinData)
+				if (comp ==62) ||(comp==60){
+					return string( comp)
+				}
+				if strings.ContainsAny("123456789", string(b2.SecondPart) ){
+					return ">"
+				}
+				return string(comp)
+			}
+		}
+	}
+	case Decimal:{
+		if b3,ok:=b.(Int);ok{
+			comp := NumberCompare( b3, a1 )
+			if comp ==">"{
+				return "<"
+			}
+			if comp =="<"{
+				return ">"
+			}
+			return string( comp)
+		}
+		if b4,ok:= b.(Decimal);ok{
+			if (!a1.NegaFlag) &&(b4.NegaFlag){
+				return ">"
+			}
+			if (a1.NegaFlag) &&(!b4.NegaFlag){
+				return "<"
+			}
+			if (!a1.NegaFlag) &&(!b4.NegaFlag){
+				comp := BBCompare(a1.FirstPart.BinData,b4.FirstPart.BinData)
+				if (comp ==62) ||(comp==60){
+					return string(comp)
+				}
+				t1 := '0'
+				t2 := '0'
+				for i:=0;i<8;i++{
+					if i< len(a1.SecondPart){
+						t1 = a1.SecondPart[i]
+					}else {
+						t1 = '0'
+					}
+					if i < len(b4.SecondPart){
+						t2 = b4.SecondPart[i]
+					}else {
+						t2 = '0'
+					}
+					tn1,err := strconv.ParseInt( string(t1),10,64 )
+					if err!=nil{
+						tn1 = 0
+					}
+					tn2,err := strconv.ParseInt( string(t2),10,64 )
+					if err!=nil{
+						tn2 = 0
+					}
+					if tn1 > tn2{
+						comp = 62
+						break
+					}
+					if tn1 < tn2{
+						comp = 60
+						break
+					}
+				}
+				return string(comp)
+			}
+			if a1.NegaFlag && b4.NegaFlag {
+				comp := BBCompare(b4.FirstPart.BinData,a1.FirstPart.BinData)
+				if (comp ==62) ||(comp==60){
+					return string(comp)
+				}
+				t1 := '0'
+				t2 := '0'
+				for i:=0;i<8;i++{
+					if i< len(a1.SecondPart){
+						t1 = a1.SecondPart[i]
+					}else {
+						t1 = '0'
+					}
+					if i < len(b4.SecondPart){
+						t2 = b4.SecondPart[i]
+					}else {
+						t2 = '0'
+					}
+					tn1,err := strconv.ParseInt( string(t1),10,64 )
+					if err!=nil{
+						tn1 = 0
+					}
+					tn2,err := strconv.ParseInt( string(t2),10,64 )
+					if err!=nil{
+						tn2 = 0
+					}
+					if tn1 > tn2{
+						comp = 60
+						break
+					}
+					if tn1 < tn2{
+						comp = 62
+						break
+					}
+				}
+				return string(comp)
+			}
+		}
+	}
+	}
+	return comp
+}
+
+func NumberCompareBool(a Number,b Number,s string)(bool,error){
+	comp := NumberCompare(a,b)
+	if (s==">") || (s=="<") || (s=="="){
+		if string(comp) == s{
+			return true,nil
+		}else{
+			return false,nil
+		}
+	} else if s==">="{
+		if (comp==">"|| comp=="="){
+			return true,nil
+		}else{
+			return false,nil
+		}
+	} else if s=="<="{
+		if (comp=="<")||(comp=="="){
+			return true,nil
+		}else{
+			return false,nil
+		}
+	} else{
+		return false,errors.New("parametor c is wrong")
+	}
+}
+
 func (a Int) AscendPower(n int) Decimal {
 	var res Decimal
 	newrawrunes := []rune{}
