@@ -202,6 +202,19 @@ func TestNumberFmt(t *testing.T) {
 	}
 }
 
+func TestNumberCompare(t *testing.T) {
+	t1,_ := InitInt("13")
+	t2,_ := InitInt("-15")
+	println( NumberCompare(t1,t2) )//">"
+}
+
+func TestNumberCompareBool(t *testing.T) {
+	t1,_ := InitInt("13")
+	t2,_ := InitInt("-15")
+	t3,err := NumberCompareBool(t1,t2,">")
+	println(t3,err)
+}
+
 func TestInt_AscendPower(t *testing.T) {
 	t1, _ := InitInt("5")
 	if string(t1.AscendPower(0).FirstPart.TenData) != "5" {

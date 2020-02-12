@@ -40,6 +40,23 @@ num3:{ RawData:-12.3, NegaFlag:true, FirstPart:num1, SecondPart:[3] }
 */
 
 
+t9,_ := InitInt("8759480")
+t9.FmtInt(",",3) // "8,759,480"
+
+t8,_ := InitDecimal("3.4955")
+t8.FmtDecimal("fixed",2)// "3.49" 
+t8.FmtDecimal("fixed",6)// "3.495500"
+t8.FmtDecimal("max",0)// "3" 
+t8.FmtDecimal("max",1)// "3.4"
+
+t9,_ := InitDecimal("8759480.6977")
+NumberFmt(t9,"-",3,"fixed",2)// "8-759-480.69"
+
+t1,_ := InitInt("13")
+t2,_ := InitInt("-15")
+NumberCompare(t1,t2)// ">"
+t3,err := NumberCompareBool(t1,t2,">")// true
+
 ```
   
  ## License
