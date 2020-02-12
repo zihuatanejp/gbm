@@ -57,6 +57,29 @@ t2,_ := InitInt("-15")
 NumberCompare(t1,t2)// ">"
 t3,err := NumberCompareBool(t1,t2,">")// true
 
+t12,_ := InitInt("68438")
+t13,_ := InitInt("234")
+t12.AddInt(t13).RawData// "68672"
+
+t10,_ := InitInt("40249")
+t11,_ := InitInt("37252")
+t10.SubInt(t11).RawData// "2997"
+
+t5,_ := InitDecimal("9999999999999999999999999999999999999999999999999999999999999999999.99")
+t6,_ := InitDecimal("0.01")
+NumberAdd(t5,t6).(Decimal).RawData// "10000000000000000000000000000000000000000000000000000000000000000000.0"
+
+t3,_ := InitDecimal("-1.1")
+NumberMultip(t3,t3).(Decimal).RawData// "1.21"
+
+t9,_ := InitInt("2")
+t10,_ := InitInt("10")
+NumberPower(t9,t10).RawData// "1024"
+
+t1,_ := InitDecimal("10.0")
+t2,_ := InitInt("3")
+NumberDivis(t1,t2).RawData// "3.33333333"
+
 ```
   
  ## License

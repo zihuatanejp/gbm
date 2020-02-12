@@ -554,6 +554,12 @@ func TestNumberPower(t *testing.T) {
 	}
 }
 
+func TestNumberDivis(t *testing.T) {
+	t1,_ := InitDecimal("10.0")
+	t2,_ := InitInt("3")
+	println( NumberDivis(t1,t2).RawData )
+}
+
 func TestInt_AddInt(t *testing.T) {
 	t1, _ := InitInt("0")
 	if t1.AddInt(t1).RawData != "0" {
